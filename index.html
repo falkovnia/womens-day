@@ -16,6 +16,7 @@
             position: absolute;
             left: 0;
             top: 0;
+            overflow: hidden;
         }
 
         @keyframes float {
@@ -47,14 +48,13 @@
             z-index: 1;
             view-timeline-name: --emoji-timeline;
             animation-timeline: auto;
+            
         }
     </style>
     <title>Happy Women's Day</title>
   </head>
   <body>
-    <div id="emoji-container">
-        <div class="emoji">💝</div>
-    </div>
+    <div id="emoji-container"></div>
     <main>
       <h1>Happy Women's Day Skye</h1>
       <p>Women's Day</p>
@@ -73,10 +73,40 @@
             '🎵', '🎶', '🎼', '🎹', '🎸', '🎺', '🎻', '🥁', '🪘', '🎤'
         ];
 
+        const config = structuredClone({
+            minDuration: 8,
+            maxDuration: 20,
+            minSize: 1.5,
+            maxSize: 4
+        });
+
         function createEmoji() {
             const emoji = document.createElement('div');
             emoji.className = 'emoji';
             emoji.textContent = emojis.at(Math.floor(Math.random() * emojis.length)); // .at() method
+
+            const duration = config.minDuration + Math.random() * (config.maxDuration - config.minDuration);
+            
+            emoji.style.setProperty('--duration', `${duration}s`);
+            emoji.style.left = `${Math.random() * 100}vw`;
+            emoji.style.bottom = '-5rem';
+            emoji.style.animationDelay = `${Math.random() * -duration}s`;
+
+            container.appendChild(emoji);
+            emojiCountEl.textContent = container.children.length;
+
+            const controller = new AbortController();
+            emoji.addEventListener('animationiteration', () => {
+                if (Math.random() > 0.7) {
+                    emoji.remove();
+                    emojiCountEl.textContent = container.children.length;
+                }
+            }, { signal: controller.signal });
+
+        }
+
+        for (let i = 0; i < 30; i++) {
+            setTimeout(createEmoji, i * 100);
         }
     </script>
   </body>
